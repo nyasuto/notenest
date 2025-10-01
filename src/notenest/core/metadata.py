@@ -52,6 +52,7 @@ class WikiLinkParser:
     """Wiki Link（[[ページ名]]）パーサー"""
 
     WIKI_LINK_PATTERN = re.compile(r"\[\[([^\]]+)\]\]")
+    EXTERNAL_LINK_PATTERN = re.compile(r"\[([^\]]+)\]\((https?://[^\)]+)\)")
 
     @classmethod
     def extract_links(cls, content: str) -> list[str]:
@@ -98,3 +99,17 @@ class WikiLinkParser:
                 return replacer(link_text.strip(), link_text.strip())
 
         return cls.WIKI_LINK_PATTERN.sub(replace_func, content)
+
+    @classmethod
+    def extract_external_links(cls, content: str) -> list[tuple[str, str]]:
+        """
+        外部リンク（http/https）を抽出
+
+        Args:
+            content: マークダウンテキスト
+
+        Returns:
+            list: (link_text, url) のタプルリスト
+        """
+        matches = cls.EXTERNAL_LINK_PATTERN.findall(content)
+        return [(text.strip(), url.strip()) for text, url in matches]
