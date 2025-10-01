@@ -147,8 +147,36 @@ class NoteNestApp(App[None]):
 
     def action_new_page(self) -> None:
         """新規ページ作成"""
-        # 簡易実装: slugとtitleを入力させる
-        self.push_screen("new_page_screen")
+        # TODO: Phase 2で実装予定
+        # 現在は手動でマークダウンファイルを作成してください
+        preview = self.query_one("#preview Markdown")
+        preview.update(
+            """# 新規ページ作成
+
+現在のMVP版では、新規ページはマークダウンファイルを直接作成してください。
+
+## 手順
+
+1. `pages/` ディレクトリに `.md` ファイルを作成
+2. Frontmatterを記述（タイトル、タグなど）
+3. `r` キーでリフレッシュ
+
+## 例
+
+```markdown
+---
+title: My New Page
+tags: [example]
+---
+
+# My New Page
+
+Content here...
+```
+
+この機能はPhase 2で実装予定です。
+"""
+        )
 
     def action_edit_page(self) -> None:
         """ページ編集（外部エディタ起動）"""

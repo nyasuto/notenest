@@ -21,6 +21,8 @@ class DBStore:
         """データベース接続"""
         self.conn = sqlite3.connect(str(self.db_path))
         self.conn.row_factory = sqlite3.Row
+        # 外部キー制約を有効化（ON DELETE CASCADEを機能させるため）
+        self.conn.execute("PRAGMA foreign_keys = ON")
         self._initialize_schema()
 
     def close(self) -> None:
