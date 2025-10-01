@@ -8,7 +8,9 @@ from notenest.ui.app import NoteNestApp
 
 def main() -> None:
     """メイン関数"""
-    parser = argparse.ArgumentParser(description="NoteNest - マークダウンベース ナレッジベース・Wikiシステム")
+    parser = argparse.ArgumentParser(
+        description="NoteNest - マークダウンベース ナレッジベース・Wikiシステム"
+    )
     parser.add_argument(
         "workspace",
         nargs="?",

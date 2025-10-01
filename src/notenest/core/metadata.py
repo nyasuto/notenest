@@ -1,6 +1,7 @@
 """メタデータ処理"""
 
 import re
+from collections.abc import Callable
 from typing import Any
 
 import frontmatter
@@ -76,7 +77,7 @@ class WikiLinkParser:
         return links
 
     @classmethod
-    def replace_links(cls, content: str, replacer: callable) -> str:
+    def replace_links(cls, content: str, replacer: Callable[[str, str], str]) -> str:
         """
         Wiki Linkを置換
 

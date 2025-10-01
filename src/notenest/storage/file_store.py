@@ -32,8 +32,12 @@ class FileStore:
         metadata: dict[str, Any] = {
             "title": page.title,
             "tags": page.tags,
-            "created": page.created_at.isoformat() if page.created_at else datetime.now().isoformat(),
-            "updated": page.updated_at.isoformat() if page.updated_at else datetime.now().isoformat(),
+            "created": page.created_at.isoformat()
+            if page.created_at
+            else datetime.now().isoformat(),
+            "updated": page.updated_at.isoformat()
+            if page.updated_at
+            else datetime.now().isoformat(),
             "metadata_type": page.metadata_type,
         }
 

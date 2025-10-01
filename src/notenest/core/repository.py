@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from notenest.core.link import Link
 from notenest.core.metadata import WikiLinkParser
@@ -32,7 +33,7 @@ class Repository:
         content: str = "",
         tags: list[str] | None = None,
         metadata_type: str = "default",
-        metadata: dict | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> Page:
         """ページを作成"""
         page = Page(
@@ -90,7 +91,7 @@ class Repository:
         title: str | None = None,
         content: str | None = None,
         tags: list[str] | None = None,
-        metadata: dict | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> Page | None:
         """ページを更新"""
         page = self.get_page(slug)
@@ -123,9 +124,7 @@ class Repository:
         self.db_store.save_links(page.id, links)
 
         # 検索インデックス更新
-        self.db_store.index_page_for_search(
-            page.id, page.slug, page.title, page.content, page.tags
-        )
+        self.db_store.index_page_for_search(page.id, page.slug, page.title, page.content, page.tags)
 
         return page
 

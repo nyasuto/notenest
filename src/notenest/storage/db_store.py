@@ -4,7 +4,6 @@ import json
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 from notenest.core.link import Link
 from notenest.core.page import Page
@@ -90,9 +89,7 @@ class DBStore:
         """)
 
         # インデックス作成
-        cursor.execute(
-            "CREATE INDEX IF NOT EXISTS idx_links_source ON links(source_page_id)"
-        )
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_links_source ON links(source_page_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_links_target ON links(target_slug)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_page_tags_page ON page_tags(page_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_page_tags_tag ON page_tags(tag_id)")
@@ -146,6 +143,7 @@ class DBStore:
                     metadata_json,
                 ),
             )
+            assert cursor.lastrowid is not None
             page_id = cursor.lastrowid
 
         self.conn.commit()
@@ -305,11 +303,12 @@ class DBStore:
         row = cursor.fetchone()
 
         if row:
-            return row["id"]
+            return int(row["id"])
 
         # 新規作成
         cursor.execute("INSERT INTO tags (name) VALUES (?)", (tag_name,))
         self.conn.commit()
+        assert cursor.lastrowid is not None
         return cursor.lastrowid
 
     def save_page_tags(self, page_id: int, tag_names: list[str]) -> None:
@@ -365,9 +364,7 @@ class DBStore:
         """)
         rows = cursor.fetchall()
 
-        return [
-            Tag(id=row["id"], name=row["name"], page_count=row["page_count"]) for row in rows
-        ]
+        return [Tag(id=row["id"], name=row["name"], page_count=row["page_count"]) for row in rows]
 
     def get_pages_by_tag(self, tag_name: str) -> list[Page]:
         """タグでページを検索"""
@@ -392,7 +389,9 @@ class DBStore:
 
     # ========== 検索操作 ==========
 
-    def index_page_for_search(self, page_id: int, slug: str, title: str, content: str, tags: list[str]) -> None:
+    def index_page_for_search(
+        self, page_id: int, slug: str, title: str, content: str, tags: list[str]
+    ) -> None:
         """ページを全文検索インデックスに追加"""
         if not self.conn:
             raise RuntimeError("Database not connected")

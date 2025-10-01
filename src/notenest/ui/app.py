@@ -6,7 +6,7 @@ from pathlib import Path
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Container, Horizontal, Vertical
+from textual.containers import Vertical
 from textual.widgets import Footer, Header, Input, Label, ListItem, ListView, Markdown, Static
 
 from notenest.core.repository import Repository
@@ -91,7 +91,9 @@ class NoteNestApp(App[None]):
 
         # プレビューエリア
         with Vertical(id="preview"):
-            yield Markdown("# Welcome to NoteNest\n\nSelect a page from the list or create a new one (n).")
+            yield Markdown(
+                "# Welcome to NoteNest\n\nSelect a page from the list or create a new one (n)."
+            )
             yield Static("", id="info-panel")
 
         yield Footer()
