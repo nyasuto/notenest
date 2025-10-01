@@ -2,6 +2,7 @@
 
 import importlib
 import inspect
+import sys
 from pathlib import Path
 
 from notenest.plugins.base import BasePlugin, ExternalDataPlugin, MetadataPlugin
@@ -26,6 +27,13 @@ class PluginRegistry:
 
         if plugin_name in self._plugins:
             raise ValueError(f"Plugin '{plugin_name}' is already registered")
+
+        # 型別の重複チェック
+        if isinstance(plugin, MetadataPlugin) and plugin.metadata_type in self._metadata_plugins:
+            raise ValueError(
+                f"Metadata type '{plugin.metadata_type}' is already registered "
+                f"by plugin '{self._metadata_plugins[plugin.metadata_type].name}'"
+            )
 
         self._plugins[plugin_name] = plugin
 
@@ -102,36 +110,48 @@ class PluginRegistry:
 
         registered_plugins: list[str] = []
 
-        # Pythonファイルを検索
-        for py_file in plugin_dir.glob("**/*.py"):
-            if py_file.name.startswith("_"):
-                continue
+        # plugin_dir.parentをsys.pathに一時的に追加
+        plugin_parent = str(plugin_dir.parent.resolve())
+        path_added = plugin_parent not in sys.path
 
-            try:
-                # モジュールパス構築
-                relative_path = py_file.relative_to(plugin_dir.parent)
-                module_path = str(relative_path.with_suffix("")).replace("/", ".")
+        if path_added:
+            sys.path.insert(0, plugin_parent)
 
-                # モジュールインポート
-                module = importlib.import_module(module_path)
+        try:
+            # Pythonファイルを検索
+            for py_file in plugin_dir.glob("**/*.py"):
+                if py_file.name.startswith("_"):
+                    continue
 
-                # プラグインクラスを探す
-                for _name, obj in inspect.getmembers(module, inspect.isclass):
-                    # BasePluginのサブクラスで、BasePlugin自体でない
-                    if (
-                        issubclass(obj, BasePlugin)
-                        and obj not in (BasePlugin, MetadataPlugin, ExternalDataPlugin)
-                        and not inspect.isabstract(obj)
-                    ):
-                        # インスタンス化して登録
-                        plugin_instance = obj()
-                        self.register(plugin_instance)
-                        registered_plugins.append(plugin_instance.name)
+                try:
+                    # モジュールパス構築
+                    relative_path = py_file.relative_to(plugin_dir.parent)
+                    module_path = str(relative_path.with_suffix("")).replace("/", ".")
 
-            except Exception as e:
-                # エラーは無視（ロギング推奨）
-                print(f"Failed to load plugin from {py_file}: {e}")
-                continue
+                    # モジュールインポート
+                    module = importlib.import_module(module_path)
+
+                    # プラグインクラスを探す
+                    for _name, obj in inspect.getmembers(module, inspect.isclass):
+                        # BasePluginのサブクラスで、BasePlugin自体でない
+                        if (
+                            issubclass(obj, BasePlugin)
+                            and obj not in (BasePlugin, MetadataPlugin, ExternalDataPlugin)
+                            and not inspect.isabstract(obj)
+                        ):
+                            # インスタンス化して登録
+                            plugin_instance = obj()
+                            self.register(plugin_instance)
+                            registered_plugins.append(plugin_instance.name)
+
+                except Exception as e:
+                    # エラーは無視（ロギング推奨）
+                    print(f"Failed to load plugin from {py_file}: {e}")
+                    continue
+        finally:
+            # sys.pathから削除（追加した場合のみ）
+            if path_added and plugin_parent in sys.path:
+                sys.path.remove(plugin_parent)
 
         return registered_plugins
 
