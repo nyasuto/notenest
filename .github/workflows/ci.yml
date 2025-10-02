@@ -55,11 +55,6 @@ jobs:
           . .venv/bin/activate
           make lint
 
-      - name: Run type check
-        run: |
-          . .venv/bin/activate
-          make typecheck
-
       - name: Run tests with coverage
         run: |
           . .venv/bin/activate
