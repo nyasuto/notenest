@@ -99,6 +99,9 @@ web-install: ## フロントエンドの依存関係をインストール
 	cd src/web/frontend && npm install
 
 web-api: ## APIサーバーを起動（ポート8000）
+	@echo "Checking for processes on port 8000..."
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@sleep 1
 	@if [ -d .venv ]; then \
 		. .venv/bin/activate && uvicorn web.api.main:app --reload --host 0.0.0.0 --port 8000; \
 	else \
@@ -106,6 +109,9 @@ web-api: ## APIサーバーを起動（ポート8000）
 	fi
 
 web-dev: ## フロントエンド開発サーバーを起動（ポート5173）
+	@echo "Checking for processes on port 5173..."
+	@lsof -ti:5173 | xargs kill -9 2>/dev/null || true
+	@sleep 1
 	cd src/web/frontend && npm run dev
 
 web-build: ## フロントエンドをビルド
