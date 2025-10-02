@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from notenest.plugins.base import MetadataPlugin
 from notenest.plugins.registry import PluginRegistry
-from web.api.main import get_plugin_registry
+from web.api.dependencies import get_plugin_registry
 from web.api.models import PluginResponse
 
 router = APIRouter()

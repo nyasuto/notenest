@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 
 from notenest.core.page import Page
 from notenest.core.repository import Repository
-from web.api.main import get_repository
+from web.api.dependencies import get_repository
 from web.api.models import PageCreate, PageListResponse, PageResponse, PageUpdate
 
 router = APIRouter()

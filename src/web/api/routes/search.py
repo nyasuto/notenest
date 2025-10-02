@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from notenest.core.repository import Repository
 from notenest.core.search import AdvancedSearch
-from web.api.main import get_repository
+from web.api.dependencies import get_repository
 from web.api.models import PageListResponse, SearchQuery
 from web.api.routes.pages import _page_to_response
 
