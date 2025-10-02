@@ -8,6 +8,7 @@ from notenest.core.link import Link
 from notenest.core.metadata import WikiLinkParser
 from notenest.core.page import Page
 from notenest.core.tag import Tag
+from notenest.plugins.registry import PluginRegistry, get_global_registry
 from notenest.storage.db_store import DBStore
 from notenest.storage.file_store import FileStore
 
@@ -15,10 +16,11 @@ from notenest.storage.file_store import FileStore
 class Repository:
     """ページ、リンク、タグの統合管理"""
 
-    def __init__(self, workspace_path: Path) -> None:
+    def __init__(self, workspace_path: Path, plugin_registry: PluginRegistry | None = None) -> None:
         self.file_store = FileStore(workspace_path)
         self.db_store = DBStore(self.file_store.get_db_path())
         self.db_store.connect()
+        self.plugin_registry = plugin_registry or get_global_registry()
 
     def close(self) -> None:
         """リソースのクリーンアップ"""
@@ -64,6 +66,11 @@ class Repository:
 
         # 検索インデックス更新
         self.db_store.index_page_for_search(page_id, slug, title, content, page.tags)
+
+        # プラグインフック: ページ作成
+        plugin = self.plugin_registry.get_metadata_plugin(metadata_type)
+        if plugin:
+            plugin.on_page_create(page_id, page.metadata)
 
         return page
 
@@ -126,6 +133,11 @@ class Repository:
         # 検索インデックス更新
         self.db_store.index_page_for_search(page.id, page.slug, page.title, page.content, page.tags)
 
+        # プラグインフック: ページ更新
+        plugin = self.plugin_registry.get_metadata_plugin(page.metadata_type)
+        if plugin:
+            plugin.on_page_update(page.id, page.metadata)
+
         return page
 
     def delete_page(self, slug: str) -> bool:
@@ -133,6 +145,11 @@ class Repository:
         page = self.db_store.get_page_by_slug(slug)
         if not page or not page.id:
             return False
+
+        # プラグインフック: ページ削除（削除前に呼び出す）
+        plugin = self.plugin_registry.get_metadata_plugin(page.metadata_type)
+        if plugin:
+            plugin.on_page_delete(page.id)
 
         # ファイル削除
         if page.file_path and page.file_path.exists():
