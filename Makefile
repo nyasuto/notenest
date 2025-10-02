@@ -1,4 +1,4 @@
-.PHONY: help setup install test format lint typecheck quality clean run demo dev-setup
+.PHONY: help setup install test format lint typecheck quality clean run demo dev-setup web-api web-dev web-build web-install
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -93,6 +93,29 @@ run: ## NoteNestを起動（カレントディレクトリ）
 
 demo: ## デモデータでNoteNestを起動
 	python -m notenest demo
+
+# Web GUI関連
+web-install: ## フロントエンドの依存関係をインストール
+	cd src/web/frontend && npm install
+
+web-api: ## APIサーバーを起動（ポート8000）
+	@echo "Checking for processes on port 8000..."
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@sleep 1
+	@if [ -d .venv ]; then \
+		. .venv/bin/activate && uvicorn web.api.main:app --reload --host 0.0.0.0 --port 8000; \
+	else \
+		uvicorn web.api.main:app --reload --host 0.0.0.0 --port 8000; \
+	fi
+
+web-dev: ## フロントエンド開発サーバーを起動（ポート5173）
+	@echo "Checking for processes on port 5173..."
+	@lsof -ti:5173 | xargs kill -9 2>/dev/null || true
+	@sleep 1
+	cd src/web/frontend && npm run dev
+
+web-build: ## フロントエンドをビルド
+	cd src/web/frontend && npm run build
 
 dev-setup: setup ## 開発環境の完全セットアップ（setup + 品質チェック）
 	@echo "Running quality checks..."
