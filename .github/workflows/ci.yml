@@ -97,3 +97,18 @@ jobs:
             exit 1
           fi
           echo "Build successful: dist directory exists"
+
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs: [python-quality, frontend-build]
+    if: always()
+
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [ "${{ needs.python-quality.result }}" != "success" ] || [ "${{ needs.frontend-build.result }}" != "success" ]; then
+            echo "One or more CI jobs failed"
+            exit 1
+          fi
+          echo "All CI jobs passed successfully"
