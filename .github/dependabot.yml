@@ -5,12 +5,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    labels:
-      - "dependencies"
-      - "python"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
     open-pull-requests-limit: 5
 
   # NPM dependencies (Frontend)
@@ -25,18 +19,9 @@ updates:
       prefix: "deps"
       include: "scope"
     open-pull-requests-limit: 5
-    ignore:
-      # Ignore major version updates for stable dependencies
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    labels:
-      - "dependencies"
-      - "github-actions"
-    commit-message:
-      prefix: "ci"
