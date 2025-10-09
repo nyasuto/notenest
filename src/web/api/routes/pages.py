@@ -12,6 +12,13 @@ router = APIRouter()
 
 def _page_to_response(page: Page) -> PageResponse:
     """PageモデルをPageResponseに変換"""
+    if page.id is None:
+        raise ValueError("Page ID is required")
+    if page.created_at is None:
+        raise ValueError("Page created_at is required")
+    if page.updated_at is None:
+        raise ValueError("Page updated_at is required")
+
     return PageResponse(
         id=page.id,
         slug=page.slug,
