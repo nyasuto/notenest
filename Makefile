@@ -117,6 +117,18 @@ web-dev: ## フロントエンド開発サーバーを起動（ポート5173）
 web-build: ## フロントエンドをビルド
 	cd src/web/frontend && npm run build
 
+serve: web-build ## 本番モードで起動（1サーバー、ポート8000）
+	@echo "Building frontend..."
+	@echo "Checking for processes on port 8000..."
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@sleep 1
+	@echo "Starting NoteNest server on http://localhost:8000"
+	@if [ -d .venv ]; then \
+		. .venv/bin/activate && uvicorn web.api.main:app --host 0.0.0.0 --port 8000; \
+	else \
+		uvicorn web.api.main:app --host 0.0.0.0 --port 8000; \
+	fi
+
 dev-setup: setup ## 開発環境の完全セットアップ（setup + 品質チェック）
 	@echo "Running quality checks..."
 	$(MAKE) quality

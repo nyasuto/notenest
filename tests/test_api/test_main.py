@@ -8,8 +8,8 @@ client = TestClient(app)
 
 
 def test_root() -> None:
-    """ルートエンドポイントのテスト"""
-    response = client.get("/")
+    """APIルートエンドポイントのテスト"""
+    response = client.get("/api")
     assert response.status_code == 200
     data = response.json()
     assert data["message"] == "NoteNest API"
