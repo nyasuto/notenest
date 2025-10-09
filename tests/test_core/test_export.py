@@ -65,7 +65,7 @@ class TestExportToHTML:
         # HTMLが生成されること
         assert html
         assert "<!DOCTYPE html>" in html
-        assert "<html lang=\"ja\">" in html
+        assert '<html lang="ja">' in html
 
         # ページ情報が含まれること
         assert "Test Page" in html
