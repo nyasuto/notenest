@@ -3,7 +3,7 @@
 from fastapi import APIRouter
 
 from notenest.core.repository import Repository
-from notenest.core.search import AdvancedSearch
+from notenest.core.search import AdvancedSearch, DateRangeFilter
 from web.api.dependencies import get_repository
 from web.api.models import PageListResponse, SearchQuery
 from web.api.routes.pages import _page_to_response
@@ -29,8 +29,11 @@ async def search_pages(query: SearchQuery) -> PageListResponse:
 
     # 高度なフィルタリング
     date_range_filter = None
-    if query.start_date and query.end_date:
-        date_range_filter = (query.start_date, query.end_date)
+    if query.start_date or query.end_date:
+        date_range_filter = DateRangeFilter(
+            start_date=query.start_date,
+            end_date=query.end_date,
+        )
 
     filtered_pages = AdvancedSearch.complex_search(
         all_pages,
