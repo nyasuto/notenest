@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-      - 'feat/**'
-      - 'fix/**'
-      - 'docs/**'
   pull_request:
     branches:
       - main
@@ -65,7 +62,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: nyasuto/notenest
-          files: ./.coverage
+          files: ./coverage.xml
           fail_ci_if_error: false
 
   frontend-build:

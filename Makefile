@@ -31,9 +31,9 @@ test-v: ## テストを詳細表示で実行
 
 test-cov: ## テストをカバレッジレポート付きで実行
 	@if [ -d .venv ]; then \
-		. .venv/bin/activate && pytest --cov=src/notenest --cov-report=html --cov-report=term; \
+		. .venv/bin/activate && pytest --cov=src/notenest --cov-report=html --cov-report=term --cov-report=xml; \
 	else \
-		pytest --cov=src/notenest --cov-report=html --cov-report=term; \
+		pytest --cov=src/notenest --cov-report=html --cov-report=term --cov-report=xml; \
 	fi
 
 format: ## コードフォーマット（ruff）
