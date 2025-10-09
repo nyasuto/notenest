@@ -60,14 +60,11 @@ jobs:
           . .venv/bin/activate
           make test-cov
 
-      - name: Upload coverage reports
+      - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
-        if: always()
         with:
-          file: ./htmlcov/index.html
-          fail_ci_if_error: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: nyasuto/notenest
 
   frontend-build:
     name: Frontend Build
